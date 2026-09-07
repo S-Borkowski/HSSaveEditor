@@ -533,6 +533,18 @@ class Season10ProgressTests(unittest.TestCase):
         self.assertEqual(entries[5], ("etheringHell", 8))
         self.assertEqual(entries[9], ("etheringHell", 6))
 
+    def test_ether_points_ignore_a_half_finished_quest_at_an_odd_stage(self):
+        # The game (StatEtherPoints) floors stage / 2 per chain: a chain at an odd
+        # stage has a quest in progress that pays nothing yet. A player reported
+        # "fractional point total" after a Wormhole run left the chain at 7.
+        result = editor.unlock_all_ether_points(SAMPLE_SAVE)
+        entries = editor.quest_chain_entries(result)
+        index_of = {chain: index for index, (chain, _progress) in entries.items()}
+        odd = editor.set_ini_value(result, "4", f"questlog_chain{index_of['etheringWormhole']}", "etheringWormhole|7", "text")
+        odd = editor.set_ini_value(odd, "4", f"questlog_chain{index_of['etheringHell']}", "etheringHell|5", "text")
+        # 87 - (11 - 3) wormhole - (27 - 18) hell
+        self.assertEqual(editor.ether_earned_points(odd), 70)
+
     def test_s10_ether_point_choices_are_exact_hundred_point_presets(self):
         self.assertEqual(editor.S10_ETHER_POINT_CHOICES, tuple(range(100, 801, 100)))
 

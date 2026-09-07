@@ -1,3 +1,17 @@
+# Hero Siege Save Editor v1.4.1
+
+## What changed
+
+- Fixed: the editor refused to open the Ether state with "Ether quest progress produced a fractional point total" when an Ether quest chain sat at an odd stage (for example a Wormhole chain at 7 after an Inferno challenge run). The game floors each chain's stage before awarding points, so a half-finished quest simply pays nothing yet; the editor now does the same instead of stopping.
+- No other behaviour changed. Ether totals, presets and staged saves work as in 1.4.0.
+
+## Tested
+
+- All 90 automated tests pass, including a new one for odd quest stages.
+- The point formula was checked against the game's own StatEtherPoints routine.
+
+This tool is for offline/single-player characters only. Close Hero Siege before editing and keep the automatic backup.
+
 # Hero Siege Save Editor v1.4.0
 
 ## What changed

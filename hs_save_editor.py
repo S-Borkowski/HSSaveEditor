@@ -43,7 +43,7 @@ from tkinter import (
 from tkinter.scrolledtext import ScrolledText
 
 
-APP_VERSION = "1.4.0"
+APP_VERSION = "1.4.1"
 APP_TITLE = f"Hero Siege Character Save Editor v{APP_VERSION}"
 HERO_SIEGE_ROOT = Path.home() / "AppData" / "Local" / "Hero_Siege"
 DEFAULT_SAVE_DIR = HERO_SIEGE_ROOT
@@ -1997,13 +1997,14 @@ def ether_earned_points(text: str) -> int:
     for chain_name, progress in quest_chain_entries(text).values():
         if chain_name in S10_ETHER_POINT_WEIGHTS:
             progress_by_chain[chain_name] = max(progress_by_chain.get(chain_name, 0), progress)
-    total = sum(
-        progress_by_chain.get(chain_name, 0) * weight / 2
+    # The game (StatEtherPoints) floors each chain's stage / 2 before applying
+    # the weight: a chain at an odd stage has a quest in progress, and that
+    # half-finished quest pays nothing yet. Reported live: Wormhole at stage 7
+    # after an Inferno challenge run made the old strict check refuse the save.
+    return sum(
+        (progress_by_chain.get(chain_name, 0) // 2) * weight
         for chain_name, weight in S10_ETHER_POINT_WEIGHTS.items()
     )
-    if not float(total).is_integer():
-        raise ValueError("Ether quest progress produced a fractional point total.")
-    return int(total)
 
 
 def active_ether_loadout_index_from_text(text: str) -> int:
